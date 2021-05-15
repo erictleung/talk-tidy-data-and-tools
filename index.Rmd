@@ -1,0 +1,276 @@
+---
+title: "tidy data and tidy tools"
+subtitle: "Overview of tools of effective data analysis"
+author: "Eric Leung"
+date: "2020-05-14"
+output:
+  xaringan::moon_reader:
+    self_contained: true
+    css: xaringan-themer.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: true
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  message = FALSE,
+  echo = TRUE
+)
+
+# Load libraries
+library(xaringanthemer)
+
+# Set up styling
+style_mono_accent(
+  base_color = "#242943",
+  header_font_google = google_font("Josefin Sans"),
+  text_font_google   = google_font("Montserrat", "300", "300i"),
+  code_font_google   = google_font("Fira Mono")
+)
+```
+
+# Overview
+
+- Tidy data
+
+- Core and useful tidyverse functions
+
+- Useful packages
+
+
+---
+
+# Tidy data overview
+
+![Tidy data](https://d33wubrfki0l68.cloudfront.net/6f1ddb544fc5c69a2478e444ab8112fb0eea23f8/91adc/images/tidy-1.png)
+
+
+---
+
+# Tidy data are easier to work with inside the tidyverse
+
+> "Tidy datasets are all alike, but every messy dataset is messy in its own
+way."
+> 
+> –– Hadley Wickham
+
+---
+
+# phyloseq data example
+
+```{r}
+library(phyloseq)
+library(speedyseq)
+
+# Load data example
+data("GlobalPatterns")
+GlobalPatterns
+```
+
+--
+
+Let's convert this into a tidy data set.
+
+---
+
+# `psmelt()` converts to tidy data
+
+```{r}
+# Create tidy data
+psm_gp <- psmelt(GlobalPatterns)
+```
+
+--
+
+```{r}
+# Make nicer data frame
+library(tibble)
+psm_gp <- tibble(psm_gp)
+```
+
+--
+
+```{r}
+psm_gp
+```
+
+
+---
+
+# Let's clean the `Descriptions` column
+
+```{r}
+# General data frame transformations
+library(dplyr)
+
+psm_gp %>%
+  select(OTU, Sample, SampleType, Description)
+```
+
+
+---
+
+# Just keep stool samples
+
+```{r}
+psm_gp %>%
+  select(OTU, Sample, SampleType, Description) %>%
+  filter(SampleType == "Feces")
+```
+
+--
+
+The descriptions have lots of information in them that we might want to
+visualize later on with ggplot2.
+
+--
+
+Difficult to plot when the data is locked in text form.
+
+
+---
+
+# Load core data wrangling libraries
+
+```{r}
+# Powerful data wrangling functions
+library(tidyr)
+```
+
+--
+
+```{r}
+# Column must be character, `Description` is currently a factor
+psm_gp %>%
+  select(OTU, Sample, SampleType, Description) %>%
+  filter(SampleType == "Feces") %>%
+  mutate(Description = as.character(Description)) %>%  #<<
+  separate_rows(Description, sep = ", ")               #<<
+```
+
+
+---
+
+# Let's move values into columns
+
+**Note**: may not be "best" design decision
+
+```{r}
+# Create `value` column to keep value
+psm_gp %>%
+  select(OTU, Sample, SampleType, Description) %>%
+  filter(SampleType == "Feces") %>%
+  mutate(Description = as.character(Description)) %>%
+  separate_rows(Description, sep = ", ") %>%
+  mutate(value = 1) %>%                  #<<
+  pivot_wider(names_from = Description,  #<<
+              values_from = value)       #<<
+```
+
+
+---
+
+# We can reverse out pivot
+
+```{r}
+psm_gp %>%
+  select(OTU, Sample, SampleType, Description) %>%
+  filter(SampleType == "Feces") %>%
+  mutate(Description = as.character(Description)) %>%
+  separate_rows(Description, sep = ", ") %>%
+  mutate(value = 1) %>%
+  pivot_wider(names_from = Description,
+              values_from = value) %>%
+  pivot_longer(cols = !c(OTU, Sample, SampleType),  #<<
+               names_to = "Description",            #<<
+               values_to = "Value")                 #<<
+```
+
+
+---
+
+# Functions reviewed
+
+- **select()** = select, subset, and remove columns from data frame
+
+--
+
+- **filter()** = remove or keep specific rows based on information in data frame
+
+--
+
+- **mutate()** = convert or transform column values
+
+--
+
+- **separate_rows()** = take column values and separate them into multiple rows
+
+--
+
+- **pivot_wider()** and **pivot_longer()** = transform data frame from long to
+  wide data
+
+
+---
+
+# Useful packages
+
+- janitor
+
+- unheadr
+
+- tidycells
+
+
+---
+
+# janitor for cleaning columns and creating frequency tables
+
+```{r}
+psm_gp %>%
+  select(OTU, Sample, SampleType, Description) %>%
+  filter(SampleType == "Feces") %>%
+  mutate(Description = as.character(Description)) %>%
+  separate_rows(Description, sep = ", ") %>%
+  clean_names() #<<
+```
+
+
+---
+
+# janitor for creating frequency tables
+
+```{r}
+psm_gp %>%
+  select(OTU, Sample, SampleType, Description) %>%
+  tably(SampleType) %>%           #<<
+  adorn_title(placement = "top")  #<<
+  adorn_totals(c("row", "col"))   #<<
+```
+
+
+
+---
+
+# tidycells for odd cell arrangements
+
+![](https://r-rudra.github.io/tidycells/articles/ext/marks.png)
+
+
+---
+
+# Resources
+
+- R for Data Science https://r4ds.had.co.nz
+- Ted's list of underrated tidyverse functions 
+  https://hugo-portfolio-example.netlify.app/projects/tidyverse_functions/
+- {janitor} R package https://github.com/sfirke/janitor
+- {unheadr} R package https://github.com/luisDVA/unheadr
+- {tidycells} https://r-rudra.github.io/tidycells/
+- Blog post on cleaning messy data 
+  https://rfortherestofus.com/2019/12/how-to-clean-messy-data-in-r/
+
