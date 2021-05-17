@@ -195,23 +195,23 @@ psm_gp %>%
 
 # Functions reviewed
 
-- **select()** = select, subset, and remove columns from data frame
+- **`select()`** = select, subset, and remove columns from data frame
 
 --
 
-- **filter()** = remove or keep specific rows based on information in data frame
+- **`filter()`** = remove or keep specific rows based on information in data frame
 
 --
 
-- **mutate()** = convert or transform column values
+- **`mutate()`** = convert or transform column values
 
 --
 
-- **separate_rows()** = take column values and separate them into multiple rows
+- **`separate_rows()`** = take column values and separate them into multiple rows
 
 --
 
-- **pivot_wider()** and **pivot_longer()** = transform data frame from long to
+- **`pivot_wider()`** and **`pivot_longer()`** = transform data frame from long to
   wide data
 
 
