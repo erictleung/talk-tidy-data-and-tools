@@ -62,7 +62,7 @@ way."
 
 # phyloseq data example
 
-```{r}
+```{r load_pkgs_data}
 library(phyloseq)
 library(speedyseq)
 
@@ -80,8 +80,7 @@ Let's convert this into a tidy data set.
 # `psmelt()` converts to tidy data
 
 ```{r}
-# Create tidy data
-psm_gp <- psmelt(GlobalPatterns)
+psm_gp <- psmelt(GlobalPatterns)  # Create tidy data
 ```
 
 --
