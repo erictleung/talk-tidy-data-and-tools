@@ -2,7 +2,7 @@
 title: "tidy data and tidy tools"
 subtitle: "Overview of tools of effective data analysis"
 author: "Eric Leung"
-date: "2020-05-14"
+date: "2020-05-17"
 output:
   xaringan::moon_reader:
     self_contained: no
