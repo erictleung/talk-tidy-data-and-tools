@@ -85,16 +85,15 @@ psm_gp <- psmelt(GlobalPatterns)  # Create tidy data
 
 --
 
-```{r}
-# Make nicer data frame
+```{r load_convert_tibble, warning=FALSE}
 library(tibble)
-psm_gp <- tibble(psm_gp)
+psm_gp <- tibble(psm_gp)  # Make nicer data frame
 ```
 
 --
 
 ```{r}
-psm_gp
+head(psm_gp, 5)  # View first five rows
 ```
 
 
@@ -102,12 +101,12 @@ psm_gp
 
 # Let's clean the `Descriptions` column
 
-```{r}
-# General data frame transformations
+```{r dplyr_basics, warning=FALSE}
 library(dplyr)
 
 psm_gp %>%
-  select(OTU, Sample, SampleType, Description)
+  select(OTU, Sample, SampleType, Description) %>%
+  head(5)
 ```
 
 
@@ -118,7 +117,8 @@ psm_gp %>%
 ```{r}
 psm_gp %>%
   select(OTU, Sample, SampleType, Description) %>%
-  filter(SampleType == "Feces")
+  filter(SampleType == "Feces") %>%
+  head(5)
 ```
 
 --
@@ -135,8 +135,7 @@ Difficult to plot when the data is locked in text form.
 
 # Load core data wrangling libraries
 
-```{r}
-# Powerful data wrangling functions
+```{r load_tidyr, warning=FALSE}
 library(tidyr)
 ```
 
@@ -148,7 +147,8 @@ psm_gp %>%
   select(OTU, Sample, SampleType, Description) %>%
   filter(SampleType == "Feces") %>%
   mutate(Description = as.character(Description)) %>%  #<<
-  separate_rows(Description, sep = ", ")               #<<
+  separate_rows(Description, sep = ", ") %>%           #<<
+  head(5)
 ```
 
 
@@ -167,7 +167,8 @@ psm_gp %>%
   separate_rows(Description, sep = ", ") %>%
   mutate(value = 1) %>%                  #<<
   pivot_wider(names_from = Description,  #<<
-              values_from = value)       #<<
+              values_from = value) %>%   #<<
+  head(5)
 ```
 
 
@@ -186,7 +187,8 @@ psm_gp %>%
               values_from = value) %>%
   pivot_longer(cols = !c(OTU, Sample, SampleType),  #<<
                names_to = "Description",            #<<
-               values_to = "Value")                 #<<
+               values_to = "Value") %>%             #<<
+  head(5)
 ```
 
 
@@ -218,24 +220,27 @@ psm_gp %>%
 
 # Useful packages
 
-- janitor
+- janitor = miscellaneous cleaning
 
-- unheadr
+- unheadr = weird nested headers
 
-- tidycells
+- tidycells = multiple tables spaced out in Excel
 
 
 ---
 
 # janitor for cleaning columns and creating frequency tables
 
-```{r}
+```{r show_janitor, warning=FALSE}
+library(janitor)
+
 psm_gp %>%
   select(OTU, Sample, SampleType, Description) %>%
   filter(SampleType == "Feces") %>%
   mutate(Description = as.character(Description)) %>%
   separate_rows(Description, sep = ", ") %>%
-  clean_names() #<<
+  clean_names() %>%  #<<
+  head(5)
 ```
 
 
@@ -243,14 +248,38 @@ psm_gp %>%
 
 # janitor for creating frequency tables
 
-```{r}
+```{r show_freq_tabs}
 psm_gp %>%
   select(OTU, Sample, SampleType, Description) %>%
-  tably(SampleType) %>%           #<<
-  adorn_title(placement = "top")  #<<
-  adorn_totals(c("row", "col"))   #<<
+  tabyl(SampleType) %>%  #<<
+  adorn_totals()         #<<
 ```
 
+
+---
+
+# unheadr for nested headers
+
+**Before**
+
+| scientific\_name        | common\_name                 | red\_list\_status | mass\_kg |
+| :---------------------- | :--------------------------- | :---------------- | -------: |
+| Asia                    | NA                           | NA                |       NA |
+| CERCOPITHECIDAE         | NA                           | NA                |       NA |
+| Trachypithecus obscurus | Dusky Langur                 | NT                |     7.13 |
+| Presbytis sumatra       | Black Sumatran Langur        | EN                |     6.00 |
+
+
+---
+
+# unheadr for nested headers
+
+**After**
+
+| scientific\_name        | common\_name                 | red\_list\_status | mass\_kg | family          |
+| :---------------------- | :--------------------------- | :---------------- | -------: | :-------------- |
+| Trachypithecus obscurus | Dusky Langur                 | NT                |     7.13 | CERCOPITHECIDAE |
+| Presbytis sumatra       | Black Sumatran Langur        | EN                |     6.00 | CERCOPITHECIDAE |
 
 
 ---
