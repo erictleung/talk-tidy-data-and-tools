@@ -5,7 +5,7 @@ author: "Eric Leung"
 date: "2020-05-14"
 output:
   xaringan::moon_reader:
-    self_contained: true
+    self_contained: no
     css: xaringan-themer.css
     lib_dir: libs
     nature:
