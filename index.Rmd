@@ -248,7 +248,7 @@ psm_gp %>%
 
 - **`dplyr::select()`** = select, subset, and remove columns from data frame
 
-- **dplyr::`filter()`** = remove or keep specific rows based on information in
+- **`dplyr::filter()`** = remove or keep specific rows based on information in
   data frame
 
 - **`dplyr::mutate()`** = convert or transform column values

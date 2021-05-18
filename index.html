@@ -122,35 +122,31 @@ head(psm_gp, 5)  # View first five rows
 
 ```
 ## # A tibble: 5 x 17
-##   OTU    Sample   Abundance
-##   &lt;chr&gt;  &lt;chr&gt;        &lt;dbl&gt;
-## 1 549656 AQC4cm     1177685
-## 2 279599 LMEpi24M    914209
-## 3 549656 AQC7cm      711043
-## 4 549656 AQC1cm      554198
-## 5 360229 M31Tong     540850
-## # … with 14 more variables:
-## #   X.SampleID &lt;fct&gt;,
-## #   Primer &lt;fct&gt;,
-## #   Final_Barcode &lt;fct&gt;,
-## #   Barcode_truncated_plus_T &lt;fct&gt;,
-## #   Barcode_full_length &lt;fct&gt;,
-## #   SampleType &lt;fct&gt;,
-## #   Description &lt;fct&gt;,
-## #   Kingdom &lt;chr&gt;,
-## #   Phylum &lt;chr&gt;,
-## #   Class &lt;chr&gt;, Order &lt;chr&gt;,
-## #   Family &lt;chr&gt;,
-## #   Genus &lt;chr&gt;,
-## #   Species &lt;chr&gt;
+##   OTU    Sample   Abundance X.SampleID Primer Final_Barcode Barcode_truncated_p…
+##   &lt;chr&gt;  &lt;chr&gt;        &lt;dbl&gt; &lt;fct&gt;      &lt;fct&gt;  &lt;fct&gt;         &lt;fct&gt;               
+## 1 549656 AQC4cm     1177685 AQC4cm     ILBC_… ACAGCT        AGCTGT              
+## 2 279599 LMEpi24M    914209 LMEpi24M   ILBC_… ACACTG        CAGTGT              
+## 3 549656 AQC7cm      711043 AQC7cm     ILBC_… ACAGTG        CACTGT              
+## 4 549656 AQC1cm      554198 AQC1cm     ILBC_… ACAGCA        TGCTGT              
+## 5 360229 M31Tong     540850 M31Tong    ILBC_… ACACGA        TCGTGT              
+## # … with 10 more variables: Barcode_full_length &lt;fct&gt;, SampleType &lt;fct&gt;,
+## #   Description &lt;fct&gt;, Kingdom &lt;chr&gt;, Phylum &lt;chr&gt;, Class &lt;chr&gt;, Order &lt;chr&gt;,
+## #   Family &lt;chr&gt;, Genus &lt;chr&gt;, Species &lt;chr&gt;
 ```
 
 
 ---
 
-# Quick note on tidyverse functions
+# Quick note on the tidyverse
 
-- 
+- The {tidyverse} package is a suite of packages
+
+- Home website https://www.tidyverse.org/
+
+- Running `library(tidyverse)` will load the main tidyverse packages
+
+- The following code loads the appropriate packages within the tidyverse when
+  needed
 
 ---
 
@@ -167,15 +163,13 @@ psm_gp %&gt;%
 
 ```
 ## # A tibble: 5 x 4
-##   OTU    Sample  SampleType   
-##   &lt;chr&gt;  &lt;chr&gt;   &lt;fct&gt;        
-## 1 549656 AQC4cm  Freshwater (…
-## 2 279599 LMEpi2… Freshwater   
-## 3 549656 AQC7cm  Freshwater (…
-## 4 549656 AQC1cm  Freshwater (…
-## 5 360229 M31Tong Tongue       
-## # … with 1 more variable:
-## #   Description &lt;fct&gt;
+##   OTU    Sample   SampleType         Description                                
+##   &lt;chr&gt;  &lt;chr&gt;    &lt;fct&gt;              &lt;fct&gt;                                      
+## 1 549656 AQC4cm   Freshwater (creek) "Allequash Creek, 3-4 cm depth"            
+## 2 279599 LMEpi24M Freshwater         "Lake Mendota Minnesota, 24 meter epilimni…
+## 3 549656 AQC7cm   Freshwater (creek) "Allequash Creek, 6-7 cm depth"            
+## 4 549656 AQC1cm   Freshwater (creek) "Allequash Creek, 0-1cm depth"             
+## 5 360229 M31Tong  Tongue             "M3, Day 1, tongue, whole body study "
 ```
 
 
@@ -193,15 +187,13 @@ psm_gp %&gt;%
 
 ```
 ## # A tibble: 5 x 4
-##   OTU    Sample  SampleType
-##   &lt;chr&gt;  &lt;chr&gt;   &lt;fct&gt;     
-## 1 331820 M11Fcsw Feces     
-## 2 331820 M31Fcsw Feces     
-## 3 189047 TS29    Feces     
-## 4 158660 M11Fcsw Feces     
-## 5 244304 M11Fcsw Feces     
-## # … with 1 more variable:
-## #   Description &lt;fct&gt;
+##   OTU    Sample  SampleType Description                               
+##   &lt;chr&gt;  &lt;chr&gt;   &lt;fct&gt;      &lt;fct&gt;                                     
+## 1 331820 M11Fcsw Feces      "M1, Day 1, fecal swab, whole body study "
+## 2 331820 M31Fcsw Feces      "M3, Day 1, fecal swab, whole body study" 
+## 3 189047 TS29    Feces      "Twin #2"                                 
+## 4 158660 M11Fcsw Feces      "M1, Day 1, fecal swab, whole body study "
+## 5 244304 M11Fcsw Feces      "M1, Day 1, fecal swab, whole body study "
 ```
 
 --
@@ -212,6 +204,8 @@ visualize later on with ggplot2.
 --
 
 Difficult to plot when the data is locked in text form.
+
+**Note**: some of the following code may not be "best" design decision
 
 
 ---
@@ -238,23 +232,19 @@ psm_gp %&gt;%
 
 ```
 ## # A tibble: 5 x 4
-##   OTU    Sample  SampleType
-##   &lt;chr&gt;  &lt;chr&gt;   &lt;fct&gt;     
-## 1 331820 M11Fcsw Feces     
-## 2 331820 M11Fcsw Feces     
-## 3 331820 M11Fcsw Feces     
-## 4 331820 M11Fcsw Feces     
-## 5 331820 M31Fcsw Feces     
-## # … with 1 more variable:
-## #   Description &lt;chr&gt;
+##   OTU    Sample  SampleType Description        
+##   &lt;chr&gt;  &lt;chr&gt;   &lt;fct&gt;      &lt;chr&gt;              
+## 1 331820 M11Fcsw Feces      "M1"               
+## 2 331820 M11Fcsw Feces      "Day 1"            
+## 3 331820 M11Fcsw Feces      "fecal swab"       
+## 4 331820 M11Fcsw Feces      "whole body study "
+## 5 331820 M31Fcsw Feces      "M3"
 ```
 
 
 ---
 
 # Let's move values into columns
-
-**Note**: may not be "best" design decision
 
 
 ```r
@@ -272,27 +262,20 @@ psm_gp %&gt;%
 
 ```
 ## # A tibble: 5 x 11
-##   OTU    Sample  SampleType
-##   &lt;chr&gt;  &lt;chr&gt;   &lt;fct&gt;     
-## 1 331820 M11Fcsw Feces     
-## 2 331820 M31Fcsw Feces     
-## 3 189047 TS29    Feces     
-## 4 158660 M11Fcsw Feces     
-## 5 244304 M11Fcsw Feces     
-## # … with 8 more variables:
-## #   M1 &lt;dbl&gt;, Day 1 &lt;dbl&gt;,
-## #   fecal swab &lt;dbl&gt;,
-## #   whole body study  &lt;dbl&gt;,
-## #   M3 &lt;dbl&gt;,
-## #   whole body study &lt;dbl&gt;,
-## #   Twin #2 &lt;dbl&gt;,
-## #   Twin #1 &lt;dbl&gt;
+##   OTU    Sample  SampleType    M1 `Day 1` `fecal swab` `whole body study `    M3
+##   &lt;chr&gt;  &lt;chr&gt;   &lt;fct&gt;      &lt;dbl&gt;   &lt;dbl&gt;        &lt;dbl&gt;               &lt;dbl&gt; &lt;dbl&gt;
+## 1 331820 M11Fcsw Feces          1       1            1                   1    NA
+## 2 331820 M31Fcsw Feces         NA       1            1                  NA     1
+## 3 189047 TS29    Feces         NA      NA           NA                  NA    NA
+## 4 158660 M11Fcsw Feces          1       1            1                   1    NA
+## 5 244304 M11Fcsw Feces          1       1            1                   1    NA
+## # … with 3 more variables: whole body study &lt;dbl&gt;, Twin #2 &lt;dbl&gt;, Twin #1 &lt;dbl&gt;
 ```
 
 
 ---
 
-# We can reverse out pivot
+# We can reverse our pivot
 
 
 ```r
@@ -312,41 +295,47 @@ psm_gp %&gt;%
 
 ```
 ## # A tibble: 5 x 5
-##   OTU    Sample  SampleType
-##   &lt;chr&gt;  &lt;chr&gt;   &lt;fct&gt;     
-## 1 331820 M11Fcsw Feces     
-## 2 331820 M11Fcsw Feces     
-## 3 331820 M11Fcsw Feces     
-## 4 331820 M11Fcsw Feces     
-## 5 331820 M11Fcsw Feces     
-## # … with 2 more variables:
-## #   Description &lt;chr&gt;,
-## #   Value &lt;dbl&gt;
+##   OTU    Sample  SampleType Description         Value
+##   &lt;chr&gt;  &lt;chr&gt;   &lt;fct&gt;      &lt;chr&gt;               &lt;dbl&gt;
+## 1 331820 M11Fcsw Feces      "M1"                    1
+## 2 331820 M11Fcsw Feces      "Day 1"                 1
+## 3 331820 M11Fcsw Feces      "fecal swab"            1
+## 4 331820 M11Fcsw Feces      "whole body study "     1
+## 5 331820 M11Fcsw Feces      "M3"                   NA
 ```
 
 
 ---
 
+# Future steps
+
+- With the code here, you could further process the data to filter on specific
+  features.
+
+- For example, you could focus on stool samples from a specific twins or a whole
+  body study.
+
+- The {stringr} package within the tidyverse will prove useful for checking the
+  contents of strings
+
+---
+
 # Functions reviewed
 
-- **`select()`** = select, subset, and remove columns from data frame
+- **Note**: the following functions are in the form `&lt;package&gt;::&lt;function&gt;`
 
---
+- **`dplyr::select()`** = select, subset, and remove columns from data frame
 
-- **`filter()`** = remove or keep specific rows based on information in data frame
+- **`dplyr::filter()`** = remove or keep specific rows based on information in
+  data frame
 
---
+- **`dplyr::mutate()`** = convert or transform column values
 
-- **`mutate()`** = convert or transform column values
+- **`tidyr::separate_rows()`** = take column values and separate them into
+  multiple rows
 
---
-
-- **`separate_rows()`** = take column values and separate them into multiple rows
-
---
-
-- **`pivot_wider()`** and **`pivot_longer()`** = transform data frame from long to
-  wide data
+- **`tidyr:pivot_wider()`** and **`tidyr::pivot_longer()`** = transform data
+  frame from long to wide data
 
 
 ---
@@ -379,15 +368,13 @@ psm_gp %&gt;%
 
 ```
 ## # A tibble: 5 x 4
-##   otu    sample  sample_type
-##   &lt;chr&gt;  &lt;chr&gt;   &lt;fct&gt;      
-## 1 331820 M11Fcsw Feces      
-## 2 331820 M11Fcsw Feces      
-## 3 331820 M11Fcsw Feces      
-## 4 331820 M11Fcsw Feces      
-## 5 331820 M31Fcsw Feces      
-## # … with 1 more variable:
-## #   description &lt;chr&gt;
+##   otu    sample  sample_type description        
+##   &lt;chr&gt;  &lt;chr&gt;   &lt;fct&gt;       &lt;chr&gt;              
+## 1 331820 M11Fcsw Feces       "M1"               
+## 2 331820 M11Fcsw Feces       "Day 1"            
+## 3 331820 M11Fcsw Feces       "fecal swab"       
+## 4 331820 M11Fcsw Feces       "whole body study "
+## 5 331820 M31Fcsw Feces       "M3"
 ```
 
 
@@ -404,28 +391,17 @@ psm_gp %&gt;%
 ```
 
 ```
-##          SampleType      n
-##               Feces  76864
-##          Freshwater  38432
-##  Freshwater (creek)  57648
-##                Mock  57648
-##               Ocean  57648
-##  Sediment (estuary)  57648
-##                Skin  57648
-##                Soil  57648
-##              Tongue  38432
-##               Total 499616
-##     percent
-##  0.15384615
-##  0.07692308
-##  0.11538462
-##  0.11538462
-##  0.11538462
-##  0.11538462
-##  0.11538462
-##  0.11538462
-##  0.07692308
-##  1.00000000
+##          SampleType      n    percent
+##               Feces  76864 0.15384615
+##          Freshwater  38432 0.07692308
+##  Freshwater (creek)  57648 0.11538462
+##                Mock  57648 0.11538462
+##               Ocean  57648 0.11538462
+##  Sediment (estuary)  57648 0.11538462
+##                Skin  57648 0.11538462
+##                Soil  57648 0.11538462
+##              Tongue  38432 0.07692308
+##               Total 499616 1.00000000
 ```
 
 
