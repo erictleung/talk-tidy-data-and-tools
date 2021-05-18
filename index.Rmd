@@ -61,12 +61,33 @@ way."
 
 ---
 
+# Objective
+
+Take built-in phyloseq object and convert it to a tidy data set. Then wrangle
+the data using tidy principles and tidyverse packages<sup>*</sup>.
+
+.footnote[[*] The "tidyverse" packages are a suite of packages that adhere to
+tidy data principles]
+
+
+---
+
+# Load packages
+
+```{r}
+library(phyloseq)
+
+# install.packages("remotes")
+# remotes::install_github("mikemc/speedyseq")
+library(speedyseq)  # Optional
+```
+
+
+---
+
 # phyloseq data example
 
 ```{r load_pkgs_data}
-library(phyloseq)
-library(speedyseq)
-
 # Load data example
 data("GlobalPatterns")
 GlobalPatterns
@@ -80,7 +101,7 @@ Let's convert this into a tidy data set.
 
 # `psmelt()` converts to tidy data
 
-```{r}
+```{r melt_phyloseq}
 psm_gp <- psmelt(GlobalPatterns)  # Create tidy data
 ```
 
@@ -93,10 +114,23 @@ psm_gp <- tibble(psm_gp)  # Make nicer data frame
 
 --
 
-```{r}
+```{r explore_melted_df}
 head(psm_gp, 5)  # View first five rows
 ```
 
+
+---
+
+# Quick note on the tidyverse
+
+- The {tidyverse} package is a suite of packages
+
+- Home website https://www.tidyverse.org/
+
+- Running `library(tidyverse)` will load the main tidyverse packages
+
+- The following code loads the appropriate packages within the tidyverse when
+  needed
 
 ---
 
@@ -131,6 +165,8 @@ visualize later on with ggplot2.
 
 Difficult to plot when the data is locked in text form.
 
+**Note**: some of the following code may not be "best" design decision
+
 
 ---
 
@@ -157,8 +193,6 @@ psm_gp %>%
 
 # Let's move values into columns
 
-**Note**: may not be "best" design decision
-
 ```{r}
 # Create `value` column to keep value
 psm_gp %>%
@@ -175,7 +209,7 @@ psm_gp %>%
 
 ---
 
-# We can reverse out pivot
+# We can reverse our pivot
 
 ```{r}
 psm_gp %>%
@@ -195,26 +229,35 @@ psm_gp %>%
 
 ---
 
+# Future steps
+
+- With the code here, you could further process the data to filter on specific
+  features.
+
+- For example, you could focus on stool samples from a specific twins or a whole
+  body study.
+
+- The {stringr} package within the tidyverse will prove useful for checking the
+  contents of strings
+
+---
+
 # Functions reviewed
 
-- **`select()`** = select, subset, and remove columns from data frame
+- **Note**: the following functions are in the form `<package>::<function>`
 
---
+- **`dplyr::select()`** = select, subset, and remove columns from data frame
 
-- **`filter()`** = remove or keep specific rows based on information in data frame
+- **dplyr::`filter()`** = remove or keep specific rows based on information in
+  data frame
 
---
+- **`dplyr::mutate()`** = convert or transform column values
 
-- **`mutate()`** = convert or transform column values
+- **`tidyr::separate_rows()`** = take column values and separate them into
+  multiple rows
 
---
-
-- **`separate_rows()`** = take column values and separate them into multiple rows
-
---
-
-- **`pivot_wider()`** and **`pivot_longer()`** = transform data frame from long to
-  wide data
+- **`tidyr:pivot_wider()`** and **`tidyr::pivot_longer()`** = transform data
+  frame from long to wide data
 
 
 ---
