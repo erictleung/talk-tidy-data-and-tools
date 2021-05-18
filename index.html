@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>tidy data and tidy tools</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Eric Leung" />
+    <meta name="date" content="2020-05-17" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# tidy data and tidy tools
+## Overview of tools of effective data analysis
+### Eric Leung
+### 2020-05-17
+
+---
+
+
+
+
+# Overview
+
+- Tidy data
+
+- Core and useful tidyverse functions
+
+- Useful packages
+
+
+---
+
+# Tidy data overview
+
+![Tidy data](https://d33wubrfki0l68.cloudfront.net/6f1ddb544fc5c69a2478e444ab8112fb0eea23f8/91adc/images/tidy-1.png)
+
+*Source*: https://r4ds.had.co.nz/tidy-data.html
+
+---
+
+# Tidy data are easier to work with inside the tidyverse
+
+&gt; "Tidy datasets are all alike, but every messy dataset is messy in its own
+way."
+&gt; 
+&gt; –– Hadley Wickham
+
+---
+
+# Objective
+
+Take built-in phyloseq object and convert it to a tidy data set. Then wrangle
+the data using tidy principles and tidyverse packages&lt;sup&gt;*&lt;/sup&gt;.
+
+.footnote[[*] The "tidyverse" packages are a suite of packages that adhere to
+tidy data principles]
+
+
+---
+
+# Load packages
+
+
+```r
+library(phyloseq)
+
+# install.packages("remotes")
+# remotes::install_github("mikemc/speedyseq")
+library(speedyseq)  # Optional
+```
+
+
+---
+
+# phyloseq data example
+
+
+```r
+# Load data example
+data("GlobalPatterns")
+GlobalPatterns
+```
+
+```
+## phyloseq-class experiment-level object
+## otu_table()   OTU Table:          [ 19216 taxa and 26 samples ]:
+## sample_data() Sample Data:        [ 26 samples by 7 sample variables ]:
+## tax_table()   Taxonomy Table:     [ 19216 taxa by 7 taxonomic ranks ]:
+## phy_tree()    Phylogenetic Tree:  [ 19216 tips and 19215 internal nodes ]:
+## taxa are rows
+```
+
+--
+
+Let's convert this into a tidy data set.
+
+---
+
+# `psmelt()` converts to tidy data
+
+
+```r
+psm_gp &lt;- psmelt(GlobalPatterns)  # Create tidy data
+```
+
+--
+
+
+```r
+library(tibble)
+psm_gp &lt;- tibble(psm_gp)  # Make nicer data frame
+```
+
+--
+
+
+```r
+head(psm_gp, 5)  # View first five rows
+```
+
+```
+## # A tibble: 5 x 17
+##   OTU    Sample   Abundance
+##   &lt;chr&gt;  &lt;chr&gt;        &lt;dbl&gt;
+## 1 549656 AQC4cm     1177685
+## 2 279599 LMEpi24M    914209
+## 3 549656 AQC7cm      711043
+## 4 549656 AQC1cm      554198
+## 5 360229 M31Tong     540850
+## # … with 14 more variables:
+## #   X.SampleID &lt;fct&gt;,
+## #   Primer &lt;fct&gt;,
+## #   Final_Barcode &lt;fct&gt;,
+## #   Barcode_truncated_plus_T &lt;fct&gt;,
+## #   Barcode_full_length &lt;fct&gt;,
+## #   SampleType &lt;fct&gt;,
+## #   Description &lt;fct&gt;,
+## #   Kingdom &lt;chr&gt;,
+## #   Phylum &lt;chr&gt;,
+## #   Class &lt;chr&gt;, Order &lt;chr&gt;,
+## #   Family &lt;chr&gt;,
+## #   Genus &lt;chr&gt;,
+## #   Species &lt;chr&gt;
+```
+
+
+---
+
+# Quick note on tidyverse functions
+
+- 
+
+---
+
+# Let's clean the `Descriptions` column
+
+
+```r
+library(dplyr)
+
+psm_gp %&gt;%
+  select(OTU, Sample, SampleType, Description) %&gt;%
+  head(5)
+```
+
+```
+## # A tibble: 5 x 4
+##   OTU    Sample  SampleType   
+##   &lt;chr&gt;  &lt;chr&gt;   &lt;fct&gt;        
+## 1 549656 AQC4cm  Freshwater (…
+## 2 279599 LMEpi2… Freshwater   
+## 3 549656 AQC7cm  Freshwater (…
+## 4 549656 AQC1cm  Freshwater (…
+## 5 360229 M31Tong Tongue       
+## # … with 1 more variable:
+## #   Description &lt;fct&gt;
+```
+
+
+---
+
+# Just keep stool samples
+
+
+```r
+psm_gp %&gt;%
+  select(OTU, Sample, SampleType, Description) %&gt;%
+  filter(SampleType == "Feces") %&gt;%
+  head(5)
+```
+
+```
+## # A tibble: 5 x 4
+##   OTU    Sample  SampleType
+##   &lt;chr&gt;  &lt;chr&gt;   &lt;fct&gt;     
+## 1 331820 M11Fcsw Feces     
+## 2 331820 M31Fcsw Feces     
+## 3 189047 TS29    Feces     
+## 4 158660 M11Fcsw Feces     
+## 5 244304 M11Fcsw Feces     
+## # … with 1 more variable:
+## #   Description &lt;fct&gt;
+```
+
+--
+
+The descriptions have lots of information in them that we might want to
+visualize later on with ggplot2.
+
+--
+
+Difficult to plot when the data is locked in text form.
+
+
+---
+
+# Load core data wrangling libraries
+
+
+```r
+library(tidyr)
+```
+
+--
+
+
+```r
+# Column must be character, `Description` is currently a factor
+psm_gp %&gt;%
+  select(OTU, Sample, SampleType, Description) %&gt;%
+  filter(SampleType == "Feces") %&gt;%
+* mutate(Description = as.character(Description)) %&gt;%
+* separate_rows(Description, sep = ", ") %&gt;%
+  head(5)
+```
+
+```
+## # A tibble: 5 x 4
+##   OTU    Sample  SampleType
+##   &lt;chr&gt;  &lt;chr&gt;   &lt;fct&gt;     
+## 1 331820 M11Fcsw Feces     
+## 2 331820 M11Fcsw Feces     
+## 3 331820 M11Fcsw Feces     
+## 4 331820 M11Fcsw Feces     
+## 5 331820 M31Fcsw Feces     
+## # … with 1 more variable:
+## #   Description &lt;chr&gt;
+```
+
+
+---
+
+# Let's move values into columns
+
+**Note**: may not be "best" design decision
+
+
+```r
+# Create `value` column to keep value
+psm_gp %&gt;%
+  select(OTU, Sample, SampleType, Description) %&gt;%
+  filter(SampleType == "Feces") %&gt;%
+  mutate(Description = as.character(Description)) %&gt;%
+  separate_rows(Description, sep = ", ") %&gt;%
+* mutate(value = 1) %&gt;%
+* pivot_wider(names_from = Description,
+*             values_from = value) %&gt;%
+  head(5)
+```
+
+```
+## # A tibble: 5 x 11
+##   OTU    Sample  SampleType
+##   &lt;chr&gt;  &lt;chr&gt;   &lt;fct&gt;     
+## 1 331820 M11Fcsw Feces     
+## 2 331820 M31Fcsw Feces     
+## 3 189047 TS29    Feces     
+## 4 158660 M11Fcsw Feces     
+## 5 244304 M11Fcsw Feces     
+## # … with 8 more variables:
+## #   M1 &lt;dbl&gt;, Day 1 &lt;dbl&gt;,
+## #   fecal swab &lt;dbl&gt;,
+## #   whole body study  &lt;dbl&gt;,
+## #   M3 &lt;dbl&gt;,
+## #   whole body study &lt;dbl&gt;,
+## #   Twin #2 &lt;dbl&gt;,
+## #   Twin #1 &lt;dbl&gt;
+```
+
+
+---
+
+# We can reverse out pivot
+
+
+```r
+psm_gp %&gt;%
+  select(OTU, Sample, SampleType, Description) %&gt;%
+  filter(SampleType == "Feces") %&gt;%
+  mutate(Description = as.character(Description)) %&gt;%
+  separate_rows(Description, sep = ", ") %&gt;%
+  mutate(value = 1) %&gt;%
+  pivot_wider(names_from = Description,
+              values_from = value) %&gt;%
+* pivot_longer(cols = !c(OTU, Sample, SampleType),
+*              names_to = "Description",
+*              values_to = "Value") %&gt;%
+  head(5)
+```
+
+```
+## # A tibble: 5 x 5
+##   OTU    Sample  SampleType
+##   &lt;chr&gt;  &lt;chr&gt;   &lt;fct&gt;     
+## 1 331820 M11Fcsw Feces     
+## 2 331820 M11Fcsw Feces     
+## 3 331820 M11Fcsw Feces     
+## 4 331820 M11Fcsw Feces     
+## 5 331820 M11Fcsw Feces     
+## # … with 2 more variables:
+## #   Description &lt;chr&gt;,
+## #   Value &lt;dbl&gt;
+```
+
+
+---
+
+# Functions reviewed
+
+- **`select()`** = select, subset, and remove columns from data frame
+
+--
+
+- **`filter()`** = remove or keep specific rows based on information in data frame
+
+--
+
+- **`mutate()`** = convert or transform column values
+
+--
+
+- **`separate_rows()`** = take column values and separate them into multiple rows
+
+--
+
+- **`pivot_wider()`** and **`pivot_longer()`** = transform data frame from long to
+  wide data
+
+
+---
+
+# Useful packages
+
+- janitor = miscellaneous cleaning
+
+- unheadr = weird nested headers
+
+- tidycells = multiple tables spaced out in Excel
+
+
+---
+
+# janitor for cleaning columns and creating frequency tables
+
+
+```r
+library(janitor)
+
+psm_gp %&gt;%
+  select(OTU, Sample, SampleType, Description) %&gt;%
+  filter(SampleType == "Feces") %&gt;%
+  mutate(Description = as.character(Description)) %&gt;%
+  separate_rows(Description, sep = ", ") %&gt;%
+* clean_names() %&gt;%
+  head(5)
+```
+
+```
+## # A tibble: 5 x 4
+##   otu    sample  sample_type
+##   &lt;chr&gt;  &lt;chr&gt;   &lt;fct&gt;      
+## 1 331820 M11Fcsw Feces      
+## 2 331820 M11Fcsw Feces      
+## 3 331820 M11Fcsw Feces      
+## 4 331820 M11Fcsw Feces      
+## 5 331820 M31Fcsw Feces      
+## # … with 1 more variable:
+## #   description &lt;chr&gt;
+```
+
+
+---
+
+# janitor for creating frequency tables
+
+
+```r
+psm_gp %&gt;%
+  select(OTU, Sample, SampleType, Description) %&gt;%
+* tabyl(SampleType) %&gt;%
+* adorn_totals()
+```
+
+```
+##          SampleType      n
+##               Feces  76864
+##          Freshwater  38432
+##  Freshwater (creek)  57648
+##                Mock  57648
+##               Ocean  57648
+##  Sediment (estuary)  57648
+##                Skin  57648
+##                Soil  57648
+##              Tongue  38432
+##               Total 499616
+##     percent
+##  0.15384615
+##  0.07692308
+##  0.11538462
+##  0.11538462
+##  0.11538462
+##  0.11538462
+##  0.11538462
+##  0.11538462
+##  0.07692308
+##  1.00000000
+```
+
+
+---
+
+# unheadr for nested headers
+
+**Before**
+
+| scientific\_name        | common\_name                 | red\_list\_status | mass\_kg |
+| :---------------------- | :--------------------------- | :---------------- | -------: |
+| Asia                    | NA                           | NA                |       NA |
+| CERCOPITHECIDAE         | NA                           | NA                |       NA |
+| Trachypithecus obscurus | Dusky Langur                 | NT                |     7.13 |
+| Presbytis sumatra       | Black Sumatran Langur        | EN                |     6.00 |
+
+
+---
+
+# unheadr for nested headers
+
+**After**
+
+| scientific\_name        | common\_name                 | red\_list\_status | mass\_kg | family          |
+| :---------------------- | :--------------------------- | :---------------- | -------: | :-------------- |
+| Trachypithecus obscurus | Dusky Langur                 | NT                |     7.13 | CERCOPITHECIDAE |
+| Presbytis sumatra       | Black Sumatran Langur        | EN                |     6.00 | CERCOPITHECIDAE |
+
+
+---
+
+# tidycells for odd cell arrangements
+
+![](https://r-rudra.github.io/tidycells/articles/ext/marks.png)
+
+
+---
+
+# Resources
+
+- R for Data Science https://r4ds.had.co.nz
+- Ted's list of underrated tidyverse functions 
+  https://hugo-portfolio-example.netlify.app/projects/tidyverse_functions/
+- {janitor} R package https://github.com/sfirke/janitor
+- {unheadr} R package https://github.com/luisDVA/unheadr
+- {tidycells} https://r-rudra.github.io/tidycells/
+- Blog post on cleaning messy data 
+  https://rfortherestofus.com/2019/12/how-to-clean-messy-data-in-r/
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
